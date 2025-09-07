@@ -1554,6 +1554,43 @@ def test_LogisticRegressionCV_no_refit(multi_class):
     assert lrcv.coef_.shape == (n_classes, n_features)
 
 
+def test_LogisticRegressionCV_refit_false_issue_14087():
+    # Test for issue #14087: IndexError with LogisticRegressionCV and refit=False
+    # This reproduces the specific issue reported in the GitHub issue
+    np.random.seed(29)
+    X = np.random.normal(size=(1000, 3))
+    beta = np.random.normal(size=3)
+    intercept = np.random.normal(size=None)
+    y = np.sign(intercept + X @ beta)
+
+    # This should not raise an IndexError
+    clf = LogisticRegressionCV(
+        cv=5,
+        solver='saga',
+        tol=1e-2,
+        refit=False
+    )
+    clf.fit(X, y)
+    
+    # Verify the model was fitted successfully
+    assert hasattr(clf, 'C_')
+    assert hasattr(clf, 'coef_')
+    assert hasattr(clf, 'intercept_')
+    
+    # Test with liblinear solver as well (mentioned in the issue)
+    clf2 = LogisticRegressionCV(
+        cv=5,
+        solver='liblinear',
+        tol=1e-2,
+        refit=False
+    )
+    clf2.fit(X, y)
+    
+    assert hasattr(clf2, 'C_')
+    assert hasattr(clf2, 'coef_')
+    assert hasattr(clf2, 'intercept_')
+
+
 def test_LogisticRegressionCV_elasticnet_attribute_shapes():
     # Make sure the shapes of scores_ and coefs_paths_ attributes are correct
     # when using elasticnet (added one dimension for l1_ratios)
