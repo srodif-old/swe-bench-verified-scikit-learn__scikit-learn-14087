@@ -2173,7 +2173,7 @@ class LogisticRegressionCV(LogisticRegression, BaseEstimator,
                     w = np.mean([coefs_paths[i, best_indices[i], :]
                                  for i in range(len(folds))], axis=0)
                 else:
-                    w = np.mean([coefs_paths[:, i, best_indices[i], :]
+                    w = np.mean([coefs_paths[i, best_indices[i], :]
                                  for i in range(len(folds))], axis=0)
 
                 best_indices_C = best_indices % len(self.Cs_)
